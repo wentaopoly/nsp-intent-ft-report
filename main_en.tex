@@ -376,6 +376,7 @@ The validation framework is the core quality assurance mechanism. We plan to imp
 
 \begin{figure}[H]
 \centering
+\resizebox{\textwidth}{!}{%
 \begin{tikzpicture}[
   every node/.style={font=\small},
   tier/.style={
@@ -405,7 +406,8 @@ The validation framework is the core quality assurance mechanism. We plan to imp
   \node[right=0.3cm of t4, font=\scriptsize, text=red!70!black] {Blocking};
   \node[right=0.3cm of t6, font=\scriptsize, text=blue!60!black] {Info only};
 
-\end{tikzpicture}
+\end{tikzpicture}%
+}
 \caption{Five-tier progressive validation stack}
 \label{fig:validation-tiers}
 \end{figure}
@@ -448,24 +450,24 @@ Validates cross-field constraints that \yang{} schemas cannot express. Table~\re
 \caption{Tier 4 semantic rules per intent type}
 \label{tab:semantic-rules}
 \small
-\begin{tabular}{lp{10.5cm}}
+\begin{tabular}{lp{9cm}}
 \toprule
 \textbf{Intent Type} & \textbf{Semantic Rules} \\
 \midrule
 \intenttype{epipe} &
-  SDP[0].source=site-a, SDP[1].source=site-b (bidirectionality); VLAN tags match; devices differ \\
+  SDP bidirectionality; VLAN tags match; devices differ \\
 \intenttype{tunnel} &
   source-ne-id $\neq$ destination-ne-id \\
 \intenttype{vprn} &
-  All site device-ids are mutually distinct; RD format is \texttt{ASN:ID} \\
+  All site device-ids distinct; RD format \texttt{ASN:ID} \\
 \intenttype{vpls} / \intenttype{evpn-vpls} &
-  Site device-ids are distinct; outer VLAN tags are consistent across all sites \\
+  Site device-ids distinct; outer VLAN tags consistent \\
 \intenttype{etree} &
-  $\geq$1 root SAP + $\geq$1 leaf SAP; site device-ids are distinct \\
+  $\geq$1 root + $\geq$1 leaf SAP; device-ids distinct \\
 \intenttype{cpipe} &
-  Devices differ; time-slots match at both endpoints; vc-type in valid enum set \\
+  Devices differ; time-slots match; vc-type in valid enum \\
 \intenttype{evpn-epipe} &
-  evpn-type matches populated sub-tree (mpls or vxlan); eth-tag equals access VLAN \\
+  evpn-type matches sub-tree (mpls/vxlan); eth-tag = VLAN \\
 \bottomrule
 \end{tabular}
 \end{table}
@@ -709,7 +711,7 @@ We adopt \lora{} (Low-Rank Adaptation) for parameter-efficient fine-tuning, trai
 \midrule
 Rank ($r$)                & 32 \\
 Scaling factor ($\alpha$) & 64 ($\alpha/r = 2.0$) \\
-Target modules           & q\_proj, k\_proj, v\_proj, o\_proj, gate\_proj, up\_proj, down\_proj \\
+Target modules           & \makecell[l]{q/k/v/o\_proj (attention) +\\gate/up/down\_proj (FFN)} \\
 Dropout                  & 0.05 \\
 Trainable parameters     & $\sim$58M / 9B (0.65\%) \\
 \bottomrule
@@ -849,29 +851,29 @@ The project proceeds through five milestones, each with defined deliverables and
 \caption{Project milestone plan}
 \label{tab:milestones}
 \small
-\begin{tabular}{clp{7cm}l}
+\begin{tabular}{clp{5.5cm}p{3.5cm}}
 \toprule
 \textbf{Milestone} & \textbf{Name} & \textbf{Objective} & \textbf{Deliverables} \\
 \midrule
 M1 & YANG Validator &
-  Implement schema parser and Tier 1+2 validation for 3 base types (epipe, tunnel, vprn) &
-  Validator code + unit tests \\
+  Schema parser + Tier 1+2 validation for 3 base types &
+  Validator code + tests \\
 \addlinespace
 M2 & Path Unification &
-  Replace hand-written path mappings with YANG-driven resolution; verify equivalence &
+  YANG-driven path resolution replacing hand-written mappings &
   Equivalence regression tests \\
 \addlinespace
-M2.5 & Inference Alignment &
-  Resolve chat template \texttt{<think>} alignment; fix inference max\_tokens &
-  Inference code + fix report \\
+M2.5 & Inference Align &
+  Chat template alignment; max\_tokens fix &
+  Inference code + report \\
 \addlinespace
-M3 & Horizontal Expansion &
-  Expand from 3 to 9 intent types; implement field definitions, templates, and Tier 4 rules per type &
+M3 & Expansion &
+  3 $\to$ 9 intent types; field defs + templates + Tier 4 rules &
   Complete 9-type dataset \\
 \addlinespace
 M3.5 & Quality Sprint &
-  Pure function generators (EVPN); E-Tree SDP semantic fix; canonical payload validation tier &
-  Final training + evaluation \\
+  Pure function generators; E-Tree SDP fix; Tier 6 &
+  Final training + eval \\
 \bottomrule
 \end{tabular}
 \end{table}

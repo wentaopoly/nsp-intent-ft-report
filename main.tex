@@ -382,6 +382,7 @@ class LeafMeta:
 
 \begin{figure}[H]
 \centering
+\resizebox{\textwidth}{!}{%
 \begin{tikzpicture}[
   every node/.style={font=\small},
   tier/.style={
@@ -411,7 +412,8 @@ class LeafMeta:
   \node[right=0.3cm of t4, font=\scriptsize, text=red!70!black] {阻断};
   \node[right=0.3cm of t6, font=\scriptsize, text=blue!60!black] {信息性};
 
-\end{tikzpicture}
+\end{tikzpicture}%
+}
 \caption{五层递进式验证栈}
 \label{fig:validation-tiers}
 \end{figure}
@@ -454,24 +456,24 @@ class LeafMeta:
 \caption{各意图类型的 Tier 4 语义规则}
 \label{tab:semantic-rules}
 \small
-\begin{tabular}{lp{10.5cm}}
+\begin{tabular}{lp{9cm}}
 \toprule
 \textbf{意图类型} & \textbf{语义规则} \\
 \midrule
 \intenttype{epipe} &
-  SDP[0] 源=site-a, SDP[1] 源=site-b（双向性）；两端 VLAN 标签一致；两端设备不同 \\
+  SDP[0] 源=site-a, SDP[1] 源=site-b（双向性）；VLAN 一致；设备不同 \\
 \intenttype{tunnel} &
   source-ne-id $\neq$ destination-ne-id \\
 \intenttype{vprn} &
   所有站点 device-id 互不相同；RD 格式为 \texttt{ASN:ID} \\
 \intenttype{vpls} / \intenttype{evpn-vpls} &
-  站点 device-id 互不相同；所有站点外层 VLAN 标签一致 \\
+  站点 device-id 互不相同；外层 VLAN 标签一致 \\
 \intenttype{etree} &
-  至少 1 个 root SAP + 至少 1 个 leaf SAP；站点 device-id 互不相同 \\
+  $\geq$1 root + $\geq$1 leaf SAP；站点 device-id 互不相同 \\
 \intenttype{cpipe} &
-  两端设备不同；两端 time-slots 匹配；vc-type 在合法枚举集合中 \\
+  设备不同；time-slots 匹配；vc-type 在合法枚举中 \\
 \intenttype{evpn-epipe} &
-  evpn-type 与 mpls/vxlan 子树匹配；eth-tag 与 access VLAN 一致 \\
+  evpn-type 与 mpls/vxlan 子树匹配；eth-tag = access VLAN \\
 \bottomrule
 \end{tabular}
 \end{table}
@@ -715,7 +717,7 @@ svc-id={ne_service_id}, mtu={mtu}, ..."
 \midrule
 秩 ($r$)                & 32 \\
 缩放系数 ($\alpha$)     & 64（$\alpha/r = 2.0$）\\
-目标模块               & q\_proj, k\_proj, v\_proj, o\_proj, gate\_proj, up\_proj, down\_proj \\
+目标模块               & \makecell[l]{q/k/v/o\_proj (attention) +\\gate/up/down\_proj (FFN)} \\
 Dropout                & 0.05 \\
 可训练参数             & $\sim$58M / 9B (0.65\%) \\
 \bottomrule
@@ -855,29 +857,29 @@ Tier 6 Recognition    & 标准载荷路径覆盖率（信息性）\\
 \caption{项目里程碑规划}
 \label{tab:milestones}
 \small
-\begin{tabular}{clp{7cm}l}
+\begin{tabular}{clp{5.5cm}p{3.5cm}}
 \toprule
 \textbf{里程碑} & \textbf{名称} & \textbf{目标} & \textbf{交付物} \\
 \midrule
 M1 & YANG 验证器 &
-  实现 Schema 解析器和 Tier 1+2 验证；对 3 种基础类型（epipe, tunnel, vprn）建立自动化校验能力 &
-  验证器代码 + 单元测试 \\
+  Schema 解析器 + Tier 1+2 验证；3 种基础类型校验 &
+  验证器代码 + 测试 \\
 \addlinespace
-M2 & 路径解析统一 &
-  用 YANG 驱动的路径解析替换手写映射，确保等价性 &
+M2 & 路径统一 &
+  YANG 驱动路径解析替换手写映射 &
   等价性回归测试 \\
 \addlinespace
 M2.5 & 推理对齐 &
-  解决 chat template \texttt{<think>} 标记对齐；修复推理 max\_tokens &
-  推理代码 + 修复报告 \\
+  chat template 对齐；max\_tokens 修复 &
+  推理代码 + 报告 \\
 \addlinespace
 M3 & 横向扩展 &
-  从 3 种扩展到 9 种意图类型；为每种类型实现字段定义、指令模板和 Tier 4 规则 &
+  3 $\to$ 9 种意图类型；字段定义 + 模板 + Tier 4 规则 &
   完整 9 类型数据集 \\
 \addlinespace
 M3.5 & 质量冲刺 &
-  纯函数生成器（EVPN 类型）；E-Tree SDP 语义修复；标准载荷验证层 &
-  最终训练+评估 \\
+  纯函数生成器；E-Tree SDP 修复；Tier 6 &
+  最终训练 + 评估 \\
 \bottomrule
 \end{tabular}
 \end{table}
